@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>POLYGLOT — AI Language Translator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080c14;
+  --surface:#0e1420;
+  --glass:rgba(255,255,255,0.04);
+  --glass-border:rgba(255,255,255,0.09);
+  --neon:#00e5ff;
+  --neon2:#7c3aed;
+  --neon-glow:rgba(0,229,255,0.18);
+  --green:#00ffb3;
+  --red:#ff4d6d;
+  --text:#e8eaf0;
+  --muted:#5a6380;
+  --dim:#2a3050;
+  --font:'Outfit',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);overflow-x:hidden}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 10%,rgba(0,229,255,0.06) 0%,transparent 65%),
+    radial-gradient(ellipse 50% 40% at 85% 80%,rgba(124,58,237,0.08) 0%,transparent 65%),
+    radial-gradient(ellipse 40% 30% at 50% 50%,rgba(0,255,179,0.03) 0%,transparent 70%);
+  pointer-events:none;z-index:0;
+  animation:bgPulse 8s ease-in-out infinite alternate;
+}
+@keyframes bgPulse{0%{opacity:0.7}100%{opacity:1}}
+
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;z-index:0;
+}
+
+.wrap{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  padding:2rem 1.25rem 3rem;
+}
+
+header{text-align:center;margin-bottom:2.5rem;animation:slideDown .6s ease both}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px}
+.logo-mark{
+  width:40px;height:40px;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:20px;box-shadow:0 0 20px var(--neon-glow);
+}
+.logo-name{
+  font-size:1.75rem;font-weight:900;letter-spacing:-0.04em;
+  background:linear-gradient(90deg,var(--neon),#a78bfa);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.sub{font-size:.8rem;color:var(--muted);font-weight:300;letter-spacing:.12em;text-transform:uppercase}
+
+.card{
+  width:100%;max-width:900px;
+  background:var(--surface);
+  border:1px solid var(--glass-border);
+  border-radius:20px;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(0,229,255,0.05),0 32px 64px rgba(0,0,0,0.5);
+  animation:slideUp .6s .1s ease both;
+  backdrop-filter:blur(12px);
+}
+
+.lang-bar{
+  display:flex;align-items:center;
+  background:rgba(0,0,0,0.3);
+  border-bottom:1px solid var(--glass-border);
+  padding:0 8px;gap:4px;
+}
+.lang-slot{flex:1;display:flex;align-items:center;gap:10px;padding:14px 16px}
+.flag{font-size:1.3rem;flex-shrink:0}
+.lang-slot select{
+  flex:1;background:transparent;border:none;outline:none;
+  font-family:var(--font);font-size:.9rem;font-weight:600;
+  color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none;
+}
+.lang-slot select option{background:#1a2035;color:var(--text);font-weight:400}
+.sep{width:1px;height:28px;background:var(--glass-border);flex-shrink:0}
+
+.swap-btn{
+  width:40px;height:40px;border-radius:50%;
+  border:1px solid var(--glass-border);background:var(--glass);
+  cursor:pointer;color:var(--neon);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .25s ease;flex-shrink:0;font-size:16px;
+}
+.swap-btn:hover{
+  background:var(--neon);color:#000;
+  box-shadow:0 0 16px var(--neon-glow);transform:rotate(180deg);
+}
+
+.panels{display:grid;grid-template-columns:1fr 1fr}
+.panel{position:relative;min-height:0}
+.panel:first-child{border-right:1px solid var(--glass-border)}
+
+.panel-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px 4px;
+}
+.panel-label{
+  font-size:.65rem;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);font-family:var(--mono);
+}
+.detected-badge{
+  display:none;font-size:.68rem;font-weight:500;
+  background:rgba(0,255,179,0.1);color:var(--green);
+  border:1px solid rgba(0,255,179,0.25);
+  border-radius:20px;padding:2px 10px;
+}
+.detected-badge.on{display:inline-block}
+
+textarea{
+  width:100%;min-height:210px;
+  padding:10px 18px 12px;
+  background:transparent;border:none;outline:none;resize:none;
+  font-family:var(--font);font-size:1rem;font-weight:300;
+  line-height:1.75;color:var(--text);caret-color:var(--neon);
+}
+textarea::placeholder{color:var(--muted)}
+
+.out-body{
+  min-height:210px;padding:10px 18px 12px;
+  font-size:1rem;font-weight:300;line-height:1.75;
+}
+.out-body.idle{color:var(--muted);font-style:italic}
+.typing-cursor::after{
+  content:'▋';color:var(--neon);
+  animation:blink .7s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+.panel-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 18px;border-top:1px solid var(--glass-border);
+  background:rgba(0,0,0,0.2);
+}
+.cc{font-size:.72rem;color:var(--muted);font-family:var(--mono)}
+.cc.hot{color:var(--red)}
+.actions{display:flex;gap:6px}
+
+.chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 12px;
+  background:var(--glass);border:1px solid var(--glass-border);
+  border-radius:20px;cursor:pointer;
+  font-family:var(--font);font-size:.73rem;font-weight:500;
+  color:var(--muted);transition:all .18s ease;
+}
+.chip:hover{
+  border-color:var(--neon);color:var(--neon);
+  background:rgba(0,229,255,0.07);
+  box-shadow:0 0 10px rgba(0,229,255,0.1);
+}
+.chip svg{width:12px;height:12px}
+
+.bottom-bar{
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  padding:18px 24px;border-top:1px solid var(--glass-border);
+  background:rgba(0,0,0,0.2);flex-wrap:wrap;
+}
+.go-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:12px 32px;
+  background:linear-gradient(135deg,var(--neon),#22b8ff);
+  border:none;border-radius:50px;cursor:pointer;
+  font-family:var(--font);font-size:.9rem;font-weight:700;
+  color:#000;letter-spacing:.02em;
+  transition:all .22s ease;
+  box-shadow:0 0 24px rgba(0,229,255,0.25);
+}
+.go-btn:hover:not(:disabled){box-shadow:0 0 36px rgba(0,229,255,0.45);transform:translateY(-2px)}
+.go-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.go-btn .spin{
+  width:14px;height:14px;
+  border:2px solid rgba(0,0,0,0.3);border-top-color:#000;
+  border-radius:50%;animation:rot .6s linear infinite;display:none;
+}
+.go-btn.busy .spin{display:block}
+.go-btn.busy .lbl{display:none}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+.status{font-size:.8rem;font-weight:500;min-height:20px}
+.status.ok{color:var(--green)}
+.status.err{color:var(--red)}
+
+.pills-row{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:10px;
+  margin-top:1.75rem;animation:slideUp .6s .3s ease both;
+}
+.info-pill{
+  display:flex;align-items:center;gap:6px;
+  font-size:.73rem;color:var(--muted);
+  background:var(--glass);border:1px solid var(--glass-border);
+  padding:5px 14px;border-radius:20px;
+}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--neon);flex-shrink:0}
+
+@keyframes slideDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.pop{animation:popIn .28s ease both}
+@keyframes flashGreen{0%,100%{background:rgba(0,0,0,.2)}50%{background:rgba(0,255,179,.07)}}
+.flash-green{animation:flashGreen .4s ease}
+
+@media(max-width:580px){
+  .panels{grid-template-columns:1fr}
+  .panel:first-child{border-right:none;border-bottom:1px solid var(--glass-border)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="logo-row">
+    <div class="logo-mark">🌐</div>
+    <div class="logo-name">POLYGLOT</div>
+  </div>
+  <p class="sub">AI Translation · 25+ Languages · Powered by Claude</p>
+</header>
+
+<div class="card">
+
+  <div class="lang-bar">
+    <div class="lang-slot">
+      <span class="flag" id="srcFlag">🔍</span>
+      <select id="srcLang" aria-label="Source language">
+        <option value="auto">Detect Language</option>
+        <option value="English">English</option>
+        <option value="French">French</option>
+        <option value="Spanish">Spanish</option>
+        <option value="Portuguese">Portuguese</option>
+        <option value="German">German</option>
+        <option value="Italian">Italian</option>
+        <option value="Dutch">Dutch</option>
+        <option value="Russian">Russian</option>
+        <option value="Chinese (Simplified)">Chinese (Simplified)</option>
+        <option value="Chinese (Traditional)">Chinese (Traditional)</option>
+        <option value="Japanese">Japanese</option>
+        <option value="Korean">Korean</option>
+        <option value="Arabic">Arabic</option>
+        <option value="Hindi">Hindi</option>
+        <option value="Swahili">Swahili</option>
+        <option value="Hausa">Hausa</option>
+        <option value="Twi">Twi</option>
+        <option value="Yoruba">Yoruba</option>
+        <option value="Igbo">Igbo</option>
+        <option value="Zulu">Zulu</option>
+        <option value="Turkish">Turkish</option>
+        <option value="Polish">Polish</option>
+        <option value="Ukrainian">Ukrainian</option>
+        <option value="Greek">Greek</option>
+        <option value="Hebrew">Hebrew</option>
+      </select>
+    </div>
+    <div class="sep"></div>
+    <button class="swap-btn" id="swapBtn" title="Swap languages">⇄</button>
+    <div class="sep"></div>
+    <div class="lang-slot">
+      <span class="flag" id="tgtFlag">🇬🇧</span>
+      <select id="tgtLang" aria-label="Target language">
+        <option value="English" selected>English</option>
+        <option value="French">French</option>
+        <option value="Spanish">Spanish</option>
+        <option value="Portuguese">Portuguese</option>
+        <option value="German">German</option>
+        <option value="Italian">Italian</option>
+        <option value="Dutch">Dutch</option>
+        <option value="Russian">Russian</option>
+        <option value="Chinese (Simplified)">Chinese (Simplified)</option>
+        <option value="Chinese (Traditional)">Chinese (Traditional)</option>
+        <option value="Japanese">Japanese</option>
+        <option value="Korean">Korean</option>
+        <option value="Arabic">Arabic</option>
+        <option value="Hindi">Hindi</option>
+        <option value="Swahili">Swahili</option>
+        <option value="Hausa">Hausa</option>
+        <option value="Twi">Twi</option>
+        <option value="Yoruba">Yoruba</option>
+        <option value="Igbo">Igbo</option>
+        <option value="Zulu">Zulu</option>
+        <option value="Turkish">Turkish</option>
+        <option value="Polish">Polish</option>
+        <option value="Ukrainian">Ukrainian</option>
+        <option value="Greek">Greek</option>
+        <option value="Hebrew">Hebrew</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="panels">
+    <div class="panel">
+      <div class="panel-top">
+        <span class="panel-label">// INPUT</span>
+        <span class="detected-badge" id="detectedBadge"></span>
+      </div>
+      <textarea id="inputText" placeholder="Type or paste text here…" maxlength="2000" spellcheck="true" aria-label="Text to translate"></textarea>
+      <div class="panel-foot">
+        <span class="cc" id="charCount">0 / 2000</span>
+        <div class="actions">
+          <button class="chip" id="clearBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Clear
+          </button>
+          <button class="chip" id="ttsSrcBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            Listen
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-top">
+        <span class="panel-label">// OUTPUT</span>
+      </div>
+      <div class="out-body idle" id="outBody" aria-live="polite">Translation appears here…</div>
+      <div class="panel-foot">
+        <span class="cc" id="outLen"></span>
+        <div class="actions">
+          <button class="chip" id="copyBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+          <button class="chip" id="ttsTgtBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            Listen
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="go-btn" id="translateBtn">
+      <div class="spin"></div>
+      <span class="lbl">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;margin-right:3px"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        TRANSLATE
+      </span>
+    </button>
+    <span class="status" id="statusMsg" role="status"></span>
+  </div>
+
+</div>
+
+<div class="pills-row">
+  <div class="info-pill"><div class="dot"></div>25+ Languages</div>
+  <div class="info-pill"><div class="dot"></div>Auto-Detect</div>
+  <div class="info-pill"><div class="dot"></div>Text-to-Speech</div>
+  <div class="info-pill"><div class="dot"></div>Claude AI</div>
+  <div class="info-pill"><div class="dot"></div>Zero Setup</div>
+</div>
+
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const inputText=$('inputText'),outBody=$('outBody'),srcLang=$('srcLang'),tgtLang=$('tgtLang');
+const srcFlag=$('srcFlag'),tgtFlag=$('tgtFlag'),translateBtn=$('translateBtn');
+const clearBtn=$('clearBtn'),copyBtn=$('copyBtn'),ttsSrcBtn=$('ttsSrcBtn'),ttsTgtBtn=$('ttsTgtBtn');
+const swapBtn=$('swapBtn'),charCount=$('charCount'),outLen=$('outLen');
+const statusMsg=$('statusMsg'),detectedBadge=$('detectedBadge');
+
+let result='',detected='';
+
+const FLAGS={
+  auto:'🔍',English:'🇬🇧',French:'🇫🇷',Spanish:'🇪🇸',Portuguese:'🇵🇹',
+  German:'🇩🇪',Italian:'🇮🇹',Dutch:'🇳🇱',Russian:'🇷🇺',
+  'Chinese (Simplified)':'🇨🇳','Chinese (Traditional)':'🇹🇼',
+  Japanese:'🇯🇵',Korean:'🇰🇷',Arabic:'🇸🇦',Hindi:'🇮🇳',
+  Swahili:'🇰🇪',Hausa:'🇳🇬',Twi:'🇬🇭',Yoruba:'🇳🇬',
+  Igbo:'🇳🇬',Zulu:'🇿🇦',Turkish:'🇹🇷',Polish:'🇵🇱',
+  Ukrainian:'🇺🇦',Greek:'🇬🇷',Hebrew:'🇮🇱'
+};
+
+const CODES={
+  English:'en-US',French:'fr-FR',Spanish:'es-ES',Portuguese:'pt-BR',
+  German:'de-DE',Italian:'it-IT',Dutch:'nl-NL',Russian:'ru-RU',
+  Japanese:'ja-JP',Korean:'ko-KR','Chinese (Simplified)':'zh-CN',
+  'Chinese (Traditional)':'zh-TW',Arabic:'ar-SA',Hindi:'hi-IN',
+  Turkish:'tr-TR',Polish:'pl-PL',Ukrainian:'uk-UA',Greek:'el-GR',
+  Hebrew:'he-IL',Swahili:'sw-KE',Hausa:'ha',Twi:'tw',
+  Yoruba:'yo',Igbo:'ig',Zulu:'zu'
+};
+
+srcLang.addEventListener('change',()=>srcFlag.textContent=FLAGS[srcLang.value]||'🌐');
+tgtLang.addEventListener('change',()=>tgtFlag.textContent=FLAGS[tgtLang.value]||'🌐');
+
+inputText.addEventListener('input',()=>{
+  const n=inputText.value.length;
+  charCount.textContent=n+' / 2000';
+  charCount.classList.toggle('hot',n>1800);
+});
+
+clearBtn.addEventListener('click',()=>{
+  inputText.value='';charCount.textContent='0 / 2000';charCount.classList.remove('hot');
+  outBody.textContent='Translation appears here…';outBody.className='out-body idle';
+  result='';outLen.textContent='';detectedBadge.className='detected-badge';
+  detected='';clearSt();
+});
+
+swapBtn.addEventListener('click',()=>{
+  const sv=srcLang.value==='auto'?(detected||'English'):srcLang.value;
+  const tv=tgtLang.value;
+  setOpt(srcLang,tv);setOpt(tgtLang,sv);
+  srcFlag.textContent=FLAGS[tv]||'🌐';tgtFlag.textContent=FLAGS[sv]||'🌐';
+  if(result){
+    inputText.value=result;charCount.textContent=result.length+' / 2000';
+    outBody.textContent='Translation appears here…';outBody.className='out-body idle';
+    result='';outLen.textContent='';
+  }
+  detectedBadge.className='detected-badge';detected='';clearSt();
+});
+
+function setOpt(sel,val){
+  for(let i=0;i<sel.options.length;i++){if(sel.options[i].value===val){sel.selectedIndex=i;return;}}
+}
+
+copyBtn.addEventListener('click',async()=>{
+  if(!result)return;
+  try{
+    await navigator.clipboard.writeText(result);
+    outBody.classList.add('flash-green');
+    setTimeout(()=>outBody.classList.remove('flash-green'),400);
+    showSt('Copied to clipboard ✓','ok');
+  }catch{showSt('Copy failed — select manually.','err');}
+});
+
+function speak(text,lang){
+  if(!window.speechSynthesis){showSt('TTS not supported.','err');return;}
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=CODES[lang]||'en-US';
+  window.speechSynthesis.speak(u);
+}
+
+ttsSrcBtn.addEventListener('click',()=>{
+  const t=inputText.value.trim();if(!t)return;
+  speak(t,srcLang.value==='auto'?(detected||'English'):srcLang.value);
+});
+ttsTgtBtn.addEventListener('click',()=>{if(result)speak(result,tgtLang.value);});
+
+let stTimer;
+function showSt(msg,type,persist=false){
+  clearTimeout(stTimer);statusMsg.textContent=msg;statusMsg.className='status '+type;
+  if(!persist)stTimer=setTimeout(clearSt,3000);
+}
+function clearSt(){statusMsg.textContent='';statusMsg.className='status';}
+
+translateBtn.addEventListener('click',async()=>{
+  const text=inputText.value.trim();
+  if(!text){showSt('Enter text first.','err',true);return;}
+  const src=srcLang.value,tgt=tgtLang.value;
+  if(src!=='auto'&&src===tgt){showSt('Same source & target language.','err',true);return;}
+
+  translateBtn.disabled=true;translateBtn.classList.add('busy');
+  outBody.textContent='';outBody.className='out-body typing-cursor';
+  outLen.textContent='';clearSt();
+
+  const srcNote=src==='auto'
+    ?'Detect the source language automatically and include it in JSON.'
+    :`Source language is ${src}.`;
+
+  const prompt=`You are a professional translator. ${srcNote}
+Translate the text below into ${tgt}.
+Reply ONLY with raw JSON — no backticks, no markdown, no extra text.
+Format: {"translation":"<translated text>","detected_language":"<source language in English>"}
+
+Text:
+"""
+${text}
+"""`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    if(!res.ok)throw new Error('API error '+res.status);
+    const data=await res.json();
+    const raw=data.content.map(b=>b.text||'').join('').trim();
+    const parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
+
+    result=parsed.translation||'';
+    detected=parsed.detected_language||'';
+    if(!result)throw new Error('Empty response.');
+
+    outBody.className='out-body pop';
+    outBody.textContent=result;
+    outLen.textContent=result.length+' chars';
+
+    if(src==='auto'&&detected){
+      detectedBadge.textContent=(FLAGS[detected]||'')+' '+detected;
+      detectedBadge.className='detected-badge on';
+      srcFlag.textContent=FLAGS[detected]||'🔍';
+    }
+    showSt('Translation complete ✓','ok');
+  }catch(e){
+    outBody.className='out-body idle';
+    outBody.textContent='Translation failed — please try again.';
+    result='';
+    showSt('Error: '+(e.message||'Request failed.'),'err',true);
+  }finally{
+    translateBtn.disabled=false;translateBtn.classList.remove('busy');
+  }
+});
+</script>
+</body>
+</html>
