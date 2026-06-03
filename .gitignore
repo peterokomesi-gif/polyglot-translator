@@ -1,0 +1,14 @@
+# Environment variables — NEVER commit this
+.env
+.env.local
+.env.*.local
+
+# Netlify
+.netlify/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node (if you add dependencies later)
+node_modules/

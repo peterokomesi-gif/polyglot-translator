@@ -20,12 +20,12 @@
   --red:#ff4d6d;
   --text:#e8eaf0;
   --muted:#5a6380;
-  --dim:#2a3050;
   --font:'Outfit',sans-serif;
   --mono:'JetBrains Mono',monospace;
 }
 html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);overflow-x:hidden}
 
+/* Animated gradient background */
 body::before{
   content:'';position:fixed;inset:0;
   background:
@@ -35,8 +35,9 @@ body::before{
   pointer-events:none;z-index:0;
   animation:bgPulse 8s ease-in-out infinite alternate;
 }
-@keyframes bgPulse{0%{opacity:0.7}100%{opacity:1}}
+@keyframes bgPulse{0%{opacity:.7}100%{opacity:1}}
 
+/* Grid overlay */
 body::after{
   content:'';position:fixed;inset:0;
   background-image:
@@ -53,34 +54,36 @@ body::after{
   padding:2rem 1.25rem 3rem;
 }
 
+/* ── HEADER ── */
 header{text-align:center;margin-bottom:2.5rem;animation:slideDown .6s ease both}
 .logo-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px}
 .logo-mark{
-  width:40px;height:40px;
+  width:42px;height:42px;
   background:linear-gradient(135deg,var(--neon),var(--neon2));
-  border-radius:10px;display:flex;align-items:center;justify-content:center;
-  font-size:20px;box-shadow:0 0 20px var(--neon-glow);
+  border-radius:11px;display:flex;align-items:center;justify-content:center;
+  font-size:22px;box-shadow:0 0 22px var(--neon-glow);
 }
 .logo-name{
-  font-size:1.75rem;font-weight:900;letter-spacing:-0.04em;
+  font-size:1.8rem;font-weight:900;letter-spacing:-0.04em;
   background:linear-gradient(90deg,var(--neon),#a78bfa);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.sub{font-size:.8rem;color:var(--muted);font-weight:300;letter-spacing:.12em;text-transform:uppercase}
+.sub{font-size:.78rem;color:var(--muted);font-weight:300;letter-spacing:.14em;text-transform:uppercase}
 
+/* ── CARD ── */
 .card{
   width:100%;max-width:900px;
   background:var(--surface);
   border:1px solid var(--glass-border);
   border-radius:20px;overflow:hidden;
-  box-shadow:0 0 0 1px rgba(0,229,255,0.05),0 32px 64px rgba(0,0,0,0.5);
+  box-shadow:0 0 0 1px rgba(0,229,255,0.05),0 32px 64px rgba(0,0,0,.5);
   animation:slideUp .6s .1s ease both;
-  backdrop-filter:blur(12px);
 }
 
+/* ── LANG BAR ── */
 .lang-bar{
   display:flex;align-items:center;
-  background:rgba(0,0,0,0.3);
+  background:rgba(0,0,0,.3);
   border-bottom:1px solid var(--glass-border);
   padding:0 8px;gap:4px;
 }
@@ -93,7 +96,6 @@ header{text-align:center;margin-bottom:2.5rem;animation:slideDown .6s ease both}
 }
 .lang-slot select option{background:#1a2035;color:var(--text);font-weight:400}
 .sep{width:1px;height:28px;background:var(--glass-border);flex-shrink:0}
-
 .swap-btn{
   width:40px;height:40px;border-radius:50%;
   border:1px solid var(--glass-border);background:var(--glass);
@@ -101,28 +103,18 @@ header{text-align:center;margin-bottom:2.5rem;animation:slideDown .6s ease both}
   display:flex;align-items:center;justify-content:center;
   transition:all .25s ease;flex-shrink:0;font-size:16px;
 }
-.swap-btn:hover{
-  background:var(--neon);color:#000;
-  box-shadow:0 0 16px var(--neon-glow);transform:rotate(180deg);
-}
+.swap-btn:hover{background:var(--neon);color:#000;box-shadow:0 0 16px var(--neon-glow);transform:rotate(180deg)}
 
+/* ── PANELS ── */
 .panels{display:grid;grid-template-columns:1fr 1fr}
-.panel{position:relative;min-height:0}
+.panel{position:relative}
 .panel:first-child{border-right:1px solid var(--glass-border)}
-
-.panel-top{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 18px 4px;
-}
-.panel-label{
-  font-size:.65rem;font-weight:700;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--muted);font-family:var(--mono);
-}
+.panel-top{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 4px}
+.panel-label{font-size:.65rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-family:var(--mono)}
 .detected-badge{
   display:none;font-size:.68rem;font-weight:500;
-  background:rgba(0,255,179,0.1);color:var(--green);
-  border:1px solid rgba(0,255,179,0.25);
-  border-radius:20px;padding:2px 10px;
+  background:rgba(0,255,179,.1);color:var(--green);
+  border:1px solid rgba(0,255,179,.25);border-radius:20px;padding:2px 10px;
 }
 .detected-badge.on{display:inline-block}
 
@@ -135,45 +127,34 @@ textarea{
 }
 textarea::placeholder{color:var(--muted)}
 
-.out-body{
-  min-height:210px;padding:10px 18px 12px;
-  font-size:1rem;font-weight:300;line-height:1.75;
-}
+.out-body{min-height:210px;padding:10px 18px 12px;font-size:1rem;font-weight:300;line-height:1.75}
 .out-body.idle{color:var(--muted);font-style:italic}
-.typing-cursor::after{
-  content:'▋';color:var(--neon);
-  animation:blink .7s step-end infinite;
-}
+.typing-cursor::after{content:'▋';color:var(--neon);animation:blink .7s step-end infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
 .panel-foot{
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 18px;border-top:1px solid var(--glass-border);
-  background:rgba(0,0,0,0.2);
+  background:rgba(0,0,0,.2);
 }
 .cc{font-size:.72rem;color:var(--muted);font-family:var(--mono)}
 .cc.hot{color:var(--red)}
 .actions{display:flex;gap:6px}
-
 .chip{
   display:inline-flex;align-items:center;gap:5px;
-  padding:5px 12px;
-  background:var(--glass);border:1px solid var(--glass-border);
+  padding:5px 12px;background:var(--glass);border:1px solid var(--glass-border);
   border-radius:20px;cursor:pointer;
   font-family:var(--font);font-size:.73rem;font-weight:500;
   color:var(--muted);transition:all .18s ease;
 }
-.chip:hover{
-  border-color:var(--neon);color:var(--neon);
-  background:rgba(0,229,255,0.07);
-  box-shadow:0 0 10px rgba(0,229,255,0.1);
-}
+.chip:hover{border-color:var(--neon);color:var(--neon);background:rgba(0,229,255,.07);box-shadow:0 0 10px rgba(0,229,255,.1)}
 .chip svg{width:12px;height:12px}
 
+/* ── BOTTOM BAR ── */
 .bottom-bar{
   display:flex;align-items:center;justify-content:center;gap:16px;
   padding:18px 24px;border-top:1px solid var(--glass-border);
-  background:rgba(0,0,0,0.2);flex-wrap:wrap;
+  background:rgba(0,0,0,.2);flex-wrap:wrap;
 }
 .go-btn{
   display:inline-flex;align-items:center;gap:9px;
@@ -182,14 +163,12 @@ textarea::placeholder{color:var(--muted)}
   border:none;border-radius:50px;cursor:pointer;
   font-family:var(--font);font-size:.9rem;font-weight:700;
   color:#000;letter-spacing:.02em;
-  transition:all .22s ease;
-  box-shadow:0 0 24px rgba(0,229,255,0.25);
+  transition:all .22s ease;box-shadow:0 0 24px rgba(0,229,255,.25);
 }
-.go-btn:hover:not(:disabled){box-shadow:0 0 36px rgba(0,229,255,0.45);transform:translateY(-2px)}
+.go-btn:hover:not(:disabled){box-shadow:0 0 36px rgba(0,229,255,.45);transform:translateY(-2px)}
 .go-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
 .go-btn .spin{
-  width:14px;height:14px;
-  border:2px solid rgba(0,0,0,0.3);border-top-color:#000;
+  width:14px;height:14px;border:2px solid rgba(0,0,0,.3);border-top-color:#000;
   border-radius:50%;animation:rot .6s linear infinite;display:none;
 }
 .go-btn.busy .spin{display:block}
@@ -200,6 +179,7 @@ textarea::placeholder{color:var(--muted)}
 .status.ok{color:var(--green)}
 .status.err{color:var(--red)}
 
+/* ── FOOTER PILLS ── */
 .pills-row{
   display:flex;flex-wrap:wrap;justify-content:center;gap:10px;
   margin-top:1.75rem;animation:slideUp .6s .3s ease both;
@@ -212,6 +192,7 @@ textarea::placeholder{color:var(--muted)}
 }
 .dot{width:5px;height:5px;border-radius:50%;background:var(--neon);flex-shrink:0}
 
+/* ── ANIMATIONS ── */
 @keyframes slideDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
 @keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 @keyframes popIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
@@ -233,11 +214,12 @@ textarea::placeholder{color:var(--muted)}
     <div class="logo-mark">🌐</div>
     <div class="logo-name">POLYGLOT</div>
   </div>
-  <p class="sub">AI Translation · 25+ Languages · Powered by Claude</p>
+  <p class="sub">AI Translation &middot; 25+ Languages &middot; Powered by Claude</p>
 </header>
 
 <div class="card">
 
+  <!-- LANG BAR -->
   <div class="lang-bar">
     <div class="lang-slot">
       <span class="flag" id="srcFlag">🔍</span>
@@ -305,6 +287,7 @@ textarea::placeholder{color:var(--muted)}
     </div>
   </div>
 
+  <!-- PANELS -->
   <div class="panels">
     <div class="panel">
       <div class="panel-top">
@@ -348,6 +331,7 @@ textarea::placeholder{color:var(--muted)}
     </div>
   </div>
 
+  <!-- BOTTOM BAR -->
   <div class="bottom-bar">
     <button class="go-btn" id="translateBtn">
       <div class="spin"></div>
@@ -361,15 +345,16 @@ textarea::placeholder{color:var(--muted)}
 
 </div>
 
+<!-- FOOTER PILLS -->
 <div class="pills-row">
   <div class="info-pill"><div class="dot"></div>25+ Languages</div>
   <div class="info-pill"><div class="dot"></div>Auto-Detect</div>
   <div class="info-pill"><div class="dot"></div>Text-to-Speech</div>
   <div class="info-pill"><div class="dot"></div>Claude AI</div>
-  <div class="info-pill"><div class="dot"></div>Zero Setup</div>
+  <div class="info-pill"><div class="dot"></div>Netlify Deployed</div>
 </div>
 
-</div>
+</div><!-- /wrap -->
 
 <script>
 const $=id=>document.getElementById(id);
@@ -379,7 +364,7 @@ const clearBtn=$('clearBtn'),copyBtn=$('copyBtn'),ttsSrcBtn=$('ttsSrcBtn'),ttsTg
 const swapBtn=$('swapBtn'),charCount=$('charCount'),outLen=$('outLen');
 const statusMsg=$('statusMsg'),detectedBadge=$('detectedBadge');
 
-let result='',detected='';
+let result='', detected='';
 
 const FLAGS={
   auto:'🔍',English:'🇬🇧',French:'🇫🇷',Spanish:'🇪🇸',Portuguese:'🇵🇹',
@@ -397,19 +382,21 @@ const CODES={
   Japanese:'ja-JP',Korean:'ko-KR','Chinese (Simplified)':'zh-CN',
   'Chinese (Traditional)':'zh-TW',Arabic:'ar-SA',Hindi:'hi-IN',
   Turkish:'tr-TR',Polish:'pl-PL',Ukrainian:'uk-UA',Greek:'el-GR',
-  Hebrew:'he-IL',Swahili:'sw-KE',Hausa:'ha',Twi:'tw',
-  Yoruba:'yo',Igbo:'ig',Zulu:'zu'
+  Hebrew:'he-IL',Swahili:'sw-KE',Hausa:'ha',Twi:'tw',Yoruba:'yo',Igbo:'ig',Zulu:'zu'
 };
 
+// Flag updates
 srcLang.addEventListener('change',()=>srcFlag.textContent=FLAGS[srcLang.value]||'🌐');
 tgtLang.addEventListener('change',()=>tgtFlag.textContent=FLAGS[tgtLang.value]||'🌐');
 
+// Char counter
 inputText.addEventListener('input',()=>{
   const n=inputText.value.length;
   charCount.textContent=n+' / 2000';
   charCount.classList.toggle('hot',n>1800);
 });
 
+// Clear
 clearBtn.addEventListener('click',()=>{
   inputText.value='';charCount.textContent='0 / 2000';charCount.classList.remove('hot');
   outBody.textContent='Translation appears here…';outBody.className='out-body idle';
@@ -417,6 +404,7 @@ clearBtn.addEventListener('click',()=>{
   detected='';clearSt();
 });
 
+// Swap
 swapBtn.addEventListener('click',()=>{
   const sv=srcLang.value==='auto'?(detected||'English'):srcLang.value;
   const tv=tgtLang.value;
@@ -434,6 +422,7 @@ function setOpt(sel,val){
   for(let i=0;i<sel.options.length;i++){if(sel.options[i].value===val){sel.selectedIndex=i;return;}}
 }
 
+// Copy
 copyBtn.addEventListener('click',async()=>{
   if(!result)return;
   try{
@@ -444,6 +433,7 @@ copyBtn.addEventListener('click',async()=>{
   }catch{showSt('Copy failed — select manually.','err');}
 });
 
+// TTS
 function speak(text,lang){
   if(!window.speechSynthesis){showSt('TTS not supported.','err');return;}
   window.speechSynthesis.cancel();
@@ -451,13 +441,13 @@ function speak(text,lang){
   u.lang=CODES[lang]||'en-US';
   window.speechSynthesis.speak(u);
 }
-
 ttsSrcBtn.addEventListener('click',()=>{
   const t=inputText.value.trim();if(!t)return;
   speak(t,srcLang.value==='auto'?(detected||'English'):srcLang.value);
 });
 ttsTgtBtn.addEventListener('click',()=>{if(result)speak(result,tgtLang.value);});
 
+// Status helpers
 let stTimer;
 function showSt(msg,type,persist=false){
   clearTimeout(stTimer);statusMsg.textContent=msg;statusMsg.className='status '+type;
@@ -465,6 +455,9 @@ function showSt(msg,type,persist=false){
 }
 function clearSt(){statusMsg.textContent='';statusMsg.className='status';}
 
+// ── TRANSLATE ──
+// Calls the Netlify serverless function (/.netlify/functions/translate)
+// The function securely adds the ANTHROPIC_API_KEY from Netlify env vars
 translateBtn.addEventListener('click',async()=>{
   const text=inputText.value.trim();
   if(!text){showSt('Enter text first.','err',true);return;}
@@ -475,38 +468,27 @@ translateBtn.addEventListener('click',async()=>{
   outBody.textContent='';outBody.className='out-body typing-cursor';
   outLen.textContent='';clearSt();
 
-  const srcNote=src==='auto'
-    ?'Detect the source language automatically and include it in JSON.'
-    :`Source language is ${src}.`;
-
-  const prompt=`You are a professional translator. ${srcNote}
-Translate the text below into ${tgt}.
-Reply ONLY with raw JSON — no backticks, no markdown, no extra text.
-Format: {"translation":"<translated text>","detected_language":"<source language in English>"}
-
-Text:
-"""
-${text}
-"""`;
-
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    // ← Calls your Netlify Function, NOT the Anthropic API directly
+    const res=await fetch('/.netlify/functions/translate',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        messages:[{role:'user',content:prompt}]
-      })
+      body:JSON.stringify({text,sourceLang:src,targetLang:tgt})
     });
-    if(!res.ok)throw new Error('API error '+res.status);
+
+    if(!res.ok){
+      const e=await res.json().catch(()=>({}));
+      throw new Error(e.error||'Function returned '+res.status);
+    }
+
     const data=await res.json();
+    // Extract Claude's text response
     const raw=data.content.map(b=>b.text||'').join('').trim();
     const parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
 
     result=parsed.translation||'';
     detected=parsed.detected_language||'';
-    if(!result)throw new Error('Empty response.');
+    if(!result)throw new Error('Empty translation returned.');
 
     outBody.className='out-body pop';
     outBody.textContent=result;
@@ -518,6 +500,7 @@ ${text}
       srcFlag.textContent=FLAGS[detected]||'🔍';
     }
     showSt('Translation complete ✓','ok');
+
   }catch(e){
     outBody.className='out-body idle';
     outBody.textContent='Translation failed — please try again.';
@@ -525,19 +508,8 @@ ${text}
     showSt('Error: '+(e.message||'Request failed.'),'err',true);
   }finally{
     translateBtn.disabled=false;translateBtn.classList.remove('busy');
-  }const res = await fetch('https://libretranslate.com/translate', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    q: text,
-    source: 'auto',
-    target: 'fr',   // target language code e.g. 'fr', 'es', 'de'
-    format: 'text'
-  })
+  }
 });
-const data = await res.json();
-console.log(data.translatedText);
-});
-</script>  
+</script>
 </body>
-</html>  
+</html>
