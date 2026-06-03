@@ -525,8 +525,19 @@ ${text}
     showSt('Error: '+(e.message||'Request failed.'),'err',true);
   }finally{
     translateBtn.disabled=false;translateBtn.classList.remove('busy');
-  }
+  }const res = await fetch('https://libretranslate.com/translate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    q: text,
+    source: 'auto',
+    target: 'fr',   // target language code e.g. 'fr', 'es', 'de'
+    format: 'text'
+  })
 });
-</script>
+const data = await res.json();
+console.log(data.translatedText);
+});
+</script>  
 </body>
-</html>
+</html>  
